@@ -1,31 +1,34 @@
 #include <ESP8266WiFiMulti.h>
 ESP8266WiFiMulti wifiMulti;
 const uint32_t connectTimeoutMs = 5000;
+void checkWiFiConnect() {
+  if (wifiMulti.run() != WL_CONNECTED) {
+    Serial.println("!!");
+  } else {
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+  }
+}
+
+#include <ESP8266HTTPClient.h>
+HTTPClient client;
+void checkWebConnection() {
+}
+void readWebData(String Link) {
+  Link = "https://www.google.co.th/";
+  client.begin(Link);
+  int httpCode = http.GET();
+  String payload = http.getString();
+  Serial.println(httpCode);
+  Serial.println(payload);
+  http.end();
+}
 
 #include <ESP8266WebServer.h>
 ESP8266WebServer server(80);
 
 String inComing = "";
-const String startIndexHtml = "<indexHtml>";
-const String stopIndexHtml = "</indexHtml>";
-unsigned int startIndexHtmlLength = startIndexHtml.length();
-String indexHtml = "";
-const String startJqueryMinJs = "<jqueryMinJs>";
-const String stopJqueryMinJs = "</jqueryMinJs>";
-unsigned int startJqueryMinJsLength = startJqueryMinJs.length();
-String jqueryMinJs = "";
-const String startBootstrapMinCss = "<bootstrapMinCss>";
-const String stopBootstrapMinCss = "</bootstrapMinCss>";
-unsigned int startBootstrapMinCssLength = startBootstrapMinCss.length();
-String bootstrapMinCss = "";
-const String startBootstrapThemeMinCss = "<bootstrapThemeMinCss>";
-const String stopBootstrapThemeMinCss = "</bootstrapThemeMinCss>";
-unsigned int startBootstrapThemeMinCssLength = startBootstrapThemeMinCss.length();
-String bootstrapThemeMinCss = "";
-const String startBootstrapMinJs = "<bootstrapMinJs>";
-const String stopBootstrapMinJs = "</bootstrapMinJs>";
-unsigned int startBootstrapMinJsLength = startBootstrapMinJs.length();
-String bootstrapMinJs = "";
 
 void setup() {
   Serial.begin(9600);
@@ -53,50 +56,16 @@ void loop() {
   checkWiFiConnect();
   server.handleClient();
 
-  while (Serial.available() > 0) {
-    inComing = Serial.readStringUntil('\n');
-    if (inComing != "") {
-      readSerialData();
-    }
-  }
+  readWebData();
+  readSerialData();
 }
 
 void readSerialData() {
-  inComing.trim();
-  unsigned long dataStart = 0;
-  unsigned long dataStop = 0;
-  if (inComing.startsWith(startIndexHtml) and inComing.endsWith(stopIndexHtml)) {
-    dataStart = inComing.indexOf(startIndexHtml) + startIndexHtmlLength;
-    dataStop = inComing.indexOf(stopIndexHtml);
-    indexHtml = inComing.substring(dataStart, dataStop);
-  } else  if (inComing.startsWith(startJqueryMinJs) and inComing.endsWith(stopJqueryMinJs)) {
-    dataStart = inComing.indexOf(startJqueryMinJs) + startJqueryMinJsLength;
-    dataStop = inComing.indexOf(stopJqueryMinJs);
-    jqueryMinJs = inComing.substring(dataStart, dataStop);
-  } else  if (inComing.startsWith(startBootstrapMinCss) and inComing.endsWith(stopBootstrapMinCss)) {
-    dataStart = inComing.indexOf(startBootstrapMinCss) + startBootstrapMinCssLength;
-    dataStop = inComing.indexOf(stopBootstrapMinCss);
-    bootstrapMinCss = inComing.substring(dataStart, dataStop);
-  } else  if (inComing.startsWith(startBootstrapThemeMinCss) and inComing.endsWith(stopBootstrapThemeMinCss)) {
-    dataStart = inComing.indexOf(startBootstrapThemeMinCss) + startBootstrapThemeMinCssLength;
-    dataStop = inComing.indexOf(stopBootstrapThemeMinCss);
-    bootstrapThemeMinCss = inComing.substring(dataStart, dataStop);
-  } else  if (inComing.startsWith(startBootstrapMinJs) and inComing.endsWith(stopBootstrapMinJs)) {
-    dataStart = inComing.indexOf(startBootstrapMinJs) + startBootstrapMinJsLength;
-    dataStop = inComing.indexOf(stopBootstrapMinJs);
-    bootstrapMinJs = inComing.substring(dataStart, dataStop);
-  }
-}
-
-void checkWiFiConnect() {
-  while (WiFi.status() != WL_CONNECTED) {
-    if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
-      Serial.print("WiFi connected: ");
-      Serial.print(WiFi.SSID());
-      Serial.print(" ");
-      Serial.println(WiFi.localIP());
-    } else {
-      Serial.println("WiFi not connected!");
+  while (Serial.available() > 0) {
+    inComing = Serial.readStringUntil('\n');
+    if (inComing != "") {
+      inComing.trim();
+      Serial.println(inComing);
     }
   }
 }
@@ -170,6 +139,10 @@ void handleRelay() {
   }
 }
 
+void handleNotFound() {
+  server.send(404, "text/html", "<h1>404 error: File not found</h1>");
+}
+
 bool is_authentified() {
   Serial.println("Enter is_authentified");
   if (server.hasHeader("Cookie")) {
@@ -183,8 +156,4 @@ bool is_authentified() {
   }
   Serial.println("Authentification Failed");
   return false;
-}
-
-void handleNotFound() {
-  server.send(404, "text/html", "<h1>404 error: File not found</h1>");
 }
