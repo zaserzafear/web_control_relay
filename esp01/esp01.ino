@@ -11,18 +11,19 @@ void checkWiFiConnect() {
   }
 }
 
+#include <WiFiClient.h>
+WiFiClient wifiClient;
 #include <ESP8266HTTPClient.h>
-HTTPClient client;
-void checkWebConnection() {
-}
-void readWebData(String Link) {
+HTTPClient httpClient;
+String readWebData(String Link) {
   Link = "https://www.google.co.th/";
-  client.begin(Link);
-  int httpCode = http.GET();
-  String payload = http.getString();
-  Serial.println(httpCode);
-  Serial.println(payload);
-  http.end();
+  httpClient.begin(wifiClient, Link);
+  int httpCode = httpClient.GET();
+  String payLoad = httpClient.getString();
+  httpClient.end();
+
+  String result = "\"httpCode\":" + String (httpCode) + ",\"payLoad\":" + payLoad;
+  return result;
 }
 
 #include <ESP8266WebServer.h>
@@ -56,7 +57,6 @@ void loop() {
   checkWiFiConnect();
   server.handleClient();
 
-  readWebData();
   readSerialData();
 }
 
