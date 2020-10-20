@@ -2,7 +2,7 @@
 ESP8266WiFiMulti wifiMulti;
 const uint32_t connectTimeoutMs = 5000;
 void checkWiFiConnect() {
-  if (wifiMulti.run() != WL_CONNECTED) {
+  if (wifiMulti.run(connectTimeoutMs) != WL_CONNECTED) {
     Serial.println("!!");
   } else {
     Serial.println("WiFi connected");
@@ -11,12 +11,14 @@ void checkWiFiConnect() {
   }
 }
 
+const String linkIndexHtml = "";
+const String linkJqueryMinJs = "";
+const String linkBootstrapMinCss = "";
 #include <WiFiClient.h>
 WiFiClient wifiClient;
 #include <ESP8266HTTPClient.h>
 HTTPClient httpClient;
-String readWebData(String Link) {
-  Link = "https://www.google.co.th/";
+String readWebData(String Link = "https://www.google.co.th/") {
   httpClient.begin(wifiClient, Link);
   int httpCode = httpClient.GET();
   String payLoad = httpClient.getString();
