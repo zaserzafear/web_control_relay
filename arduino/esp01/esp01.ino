@@ -11,9 +11,11 @@ void checkWiFiConnect() {
   }
 }
 
-const String linkIndexHtml = "";
-const String linkJqueryMinJs = "";
-const String linkBootstrapMinCss = "";
+const String linkIndexHtml = "https://drive.google.com/uc?export=download&id=19jHTfveYjz8lz64_wMkonXL7kJmEwdgb";
+const String linkJqueryMinJs = "https://drive.google.com/uc?export=download&id=197YSxH7ZgGUKBJ1HhDRJ0cY8KVTvTKBy";
+const String linkBootstrapMinCss = "https://drive.google.com/uc?export=download&id=1IAqyMu7ISbN9M5-X3WrwvbqnIeWlr4Zr";
+const String linkBootstrapThemeMinCss = "https://drive.google.com/uc?export=download&id=1y33RHBGHvauCW1gurxObcAu9uzZIk7n5";
+const String linkBootstrapMinJs = "https://drive.google.com/uc?export=download&id=1O9yRCHjNdCKRmaVQlxPNLA40TcDLY2XQ";
 #include <WiFiClient.h>
 WiFiClient wifiClient;
 #include <ESP8266HTTPClient.h>
