@@ -3,14 +3,13 @@ ESP8266WiFiMulti wifiMulti;
 const uint32_t connectTimeoutMs = 5000;
 void checkWiFiConnect() {
   if (wifiMulti.run(connectTimeoutMs) != WL_CONNECTED) {
-    Serial.println("!!");
+    Serial.println("!");
   } else {
     Serial.println("WiFi connected");
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
   }
 }
-
 
 #include <WiFiClient.h>
 WiFiClient wifiClient;
@@ -172,7 +171,6 @@ void handleRelay() {
 
   if (server.hasArg("relay")) {
     Serial.println(server.arg("relay"));
-    return;
   }
 }
 

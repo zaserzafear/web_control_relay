@@ -40,13 +40,13 @@
                         <h1 class="text-center">Computer Control By : ZaserZafear</h1>
                         <form class="form-horizontal inputForm">
                             <div class="form-group">
-                                <button type="button" class="btn btn-success btn-lg btn-block">Power On.</button>
+                                <button id="btnPowerOn" type="button" class="btn btn-success btn-lg btn-block">Power On.</button>
                             </div>
                             <div class="form-group">
-                                <button type="button" class="btn btn-warning btn-lg btn-block">Restart.</button>
+                                <button id="btnPowerRestart" type="button" class="btn btn-warning btn-lg btn-block">Restart.</button>
                             </div>
                             <div class="form-group">
-                                <button type="button" class="btn btn-danger btn-lg btn-block">Clear BIOS.</button>
+                                <button id="btnClearBios" type="button" class="btn btn-danger btn-lg btn-block">Clear BIOS.</button>
                             </div>
                         </form>
                     </div>
@@ -54,5 +54,37 @@
             </div>
         </div>
 
+        <script type="text/javascript">
+            $("#btnPowerOn").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "relay",
+                    data: {relay: "power"},
+                    success: function (response) {
+                        console.log(response);
+                    }
+                });
+            });
+            $("#btnPowerRestart").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "relay",
+                    data: {relay: "restart"},
+                    success: function (response) {
+                        console.log(response);
+                    }
+                });
+            });
+            $("#btnClearBios").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "relay",
+                    data: {relay: "clear"},
+                    success: function (response) {
+                        console.log(response);
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
