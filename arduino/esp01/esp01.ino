@@ -11,11 +11,7 @@ void checkWiFiConnect() {
   }
 }
 
-const String linkIndexHtml = "https://drive.google.com/uc?export=download&id=19jHTfveYjz8lz64_wMkonXL7kJmEwdgb";
-const String linkJqueryMinJs = "https://drive.google.com/uc?export=download&id=197YSxH7ZgGUKBJ1HhDRJ0cY8KVTvTKBy";
-const String linkBootstrapMinCss = "https://drive.google.com/uc?export=download&id=1IAqyMu7ISbN9M5-X3WrwvbqnIeWlr4Zr";
-const String linkBootstrapThemeMinCss = "https://drive.google.com/uc?export=download&id=1y33RHBGHvauCW1gurxObcAu9uzZIk7n5";
-const String linkBootstrapMinJs = "https://drive.google.com/uc?export=download&id=1O9yRCHjNdCKRmaVQlxPNLA40TcDLY2XQ";
+
 #include <WiFiClient.h>
 WiFiClient wifiClient;
 #include <ESP8266HTTPClient.h>
@@ -25,57 +21,20 @@ String readWebData(String Link = "https://www.google.co.th/") {
   int httpCode = httpClient.GET();
   String payLoad = httpClient.getString();
   httpClient.end();
-
-  String result = "\"httpCode\":" + String (httpCode) + ",\"payLoad\":" + payLoad;
-  return result;
+  return payLoad;
 }
 
 #include <ESP8266WebServer.h>
 ESP8266WebServer server(80);
-
-String inComing = "";
-
-void setup() {
-  Serial.begin(9600);
-  Serial.print("Last Upload = ");
-  Serial.print(__DATE__);
-  Serial.print(" / ");
-  Serial.print(__TIME__);
-  Serial.println();
-
-  WiFi.mode(WIFI_STA);
-  wifiMulti.addAP("Note_WIFI", "11111111");
-
-  server.on("/", handleRoot);
-  server.on("/login", handleLogin);
-  server.on("/relay", handleRelay);
-  server.onNotFound(handleNotFound);
-  const char * headerkeys[] = {"User-Agent", "Cookie"} ;
-  size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
-  server.collectHeaders(headerkeys, headerkeyssize);
-  server.begin();
-  Serial.println("HTTP server started");
-}
-
-void loop() {
-  checkWiFiConnect();
-  server.handleClient();
-
-  readSerialData();
-}
-
-void readSerialData() {
-  while (Serial.available() > 0) {
-    inComing = Serial.readStringUntil('\n');
-    if (inComing != "") {
-      inComing.trim();
-      Serial.println(inComing);
-    }
-  }
-}
-
+const String linkIndexHtml = "https://drive.google.com/uc?export=download&id=19jHTfveYjz8lz64_wMkonXL7kJmEwdgb";
+const String linkLoginHtml = "https://drive.google.com/uc?export=download&id=132b_zs15qLgbJs-HemHpUqT84gM7zHvz";
+const String linkJqueryMinJs = "https://drive.google.com/uc?export=download&id=197YSxH7ZgGUKBJ1HhDRJ0cY8KVTvTKBy";
+const String linkBootstrapMinCss = "https://drive.google.com/uc?export=download&id=1IAqyMu7ISbN9M5-X3WrwvbqnIeWlr4Zr";
+const String linkBootstrapMinCssMap = "https://drive.google.com/uc?export=download&id=1Cxyrildg1I5IDPRkjvwvT4FzCBv-A5GC";
+const String linkBootstrapThemeMinCss = "https://drive.google.com/uc?export=download&id=1y33RHBGHvauCW1gurxObcAu9uzZIk7n5";
+const String linkBootstrapThemeMinCssMap = "https://drive.google.com/uc?export=download&id=1d73zR0sG4CFH4U4PMuwRQ_NZTiMauJ16";
+const String linkBootstrapMinJs = "https://drive.google.com/uc?export=download&id=1O9yRCHjNdCKRmaVQlxPNLA40TcDLY2XQ";
 void handleRoot() {
-  String header;
   if (!is_authentified()) {
     server.sendHeader("Location", "/login");
     server.sendHeader("Cache-Control", "no-cache");
@@ -83,14 +42,10 @@ void handleRoot() {
     return;
   }
 
-  String content = "<html><body><H2>hello, you successfully connected to esp8266!</H2><br>";
-  if (server.hasHeader("User-Agent")) {
-    content += "the user agent used is : " + server.header("User-Agent") + "<br><br>";
-  }
-  content += "You can access this page until you <a href=\"/login?DISCONNECT=YES\">disconnect</a></body></html>";
+  String result = readWebData(linkIndexHtml);
+  String content;
   server.send(200, "text/html", content);
 }
-
 void handleLogin() {
   String msg;
   if (server.hasHeader("Cookie")) {
@@ -127,6 +82,84 @@ void handleLogin() {
   content += "<input type='submit' name='SUBMIT' value='Submit'></form>" + msg + "<br>";
 
   server.send(200, "text/html", content);
+}
+void handleJqueryMinJs() {
+  String result = readWebData(linkJqueryMinJs);
+  String content;
+  server.send(200, "text/javascript", content);
+}
+void handleBootstrapMinCss() {
+  String result = readWebData(linkBootstrapMinCss);
+  String content;
+  server.send(200, "text/css", content);
+}
+void handleBootstrapMinCssMap() {
+  String result = readWebData(linkBootstrapMinCssMap);
+  String content;
+  server.send(200, "text/css", content);
+}
+void handleBootstrapThemeMinCss() {
+  String result = readWebData(linkBootstrapThemeMinCss);
+  String content;
+  server.send(200, "text/css", content);
+}
+void handleBootstrapThemeMinCssMap() {
+  String result = readWebData(linkBootstrapThemeMinCssMap);
+  String content;
+  server.send(200, "text/css", content);
+}
+void handleBootstrapMinJs() {
+  String result = readWebData(linkBootstrapMinJs);
+  String content;
+  server.send(200, "text/javascript", content);
+}
+
+String inComing = "";
+
+void setup() {
+  Serial.begin(9600);
+  Serial.print("Last Upload = ");
+  Serial.print(__DATE__);
+  Serial.print(" / ");
+  Serial.print(__TIME__);
+  Serial.println();
+
+  WiFi.mode(WIFI_STA);
+  wifiMulti.addAP("Note_WIFI", "11111111");
+
+  server.on("/", handleRoot);
+  server.on("/login", handleLogin);
+  server.on("/js/jquery.min.js", handleJqueryMinJs);
+  server.on("/css/bootstrap.min.css", handleBootstrapMinCss);
+  server.on("/css/bootstrap.min.css.map", handleBootstrapMinCssMap);
+  server.on("/css/bootstrap-theme.min.css", handleBootstrapThemeMinCss);
+  server.on("/css/bootstrap-theme.min.css.map", handleBootstrapThemeMinCssMap);
+  server.on("/js/bootstrap.min.js", handleBootstrapMinJs);
+
+  server.on("/relay", handleRelay);
+  server.onNotFound(handleNotFound);
+  const char * headerkeys[] = {"User-Agent", "Cookie"} ;
+  size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
+  server.collectHeaders(headerkeys, headerkeyssize);
+  server.begin();
+  Serial.println("HTTP server started");
+}
+
+void loop() {
+  checkWiFiConnect();
+  server.handleClient();
+
+  readSerialData();
+}
+
+void readSerialData() {
+  while (Serial.available() > 0) {
+    inComing = Serial.readStringUntil('\n');
+    if (inComing != "") {
+      inComing.trim();
+      Serial.println(inComing);
+    }
+  }
 }
 
 void handleRelay() {
