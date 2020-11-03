@@ -1,49 +1,34 @@
 #include <ESP8266WiFiMulti.h>
 ESP8266WiFiMulti wifiMulti;
-const uint32_t connectTimeoutMs = 5000;
 void checkWiFiConnect() {
-  if (wifiMulti.run(connectTimeoutMs) != WL_CONNECTED) {
-    Serial.println("!");
-  } else {
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
+  while (WiFi.status() != WL_CONNECTED) {
+    if (wifiMulti.run() == WL_CONNECTED) {
+      Serial.println("WiFi connected");
+      Serial.println("IP address: ");
+      Serial.println(WiFi.localIP());
+    }
   }
-}
-
-#include <WiFiClient.h>
-WiFiClient wifiClient;
-#include <ESP8266HTTPClient.h>
-HTTPClient httpClient;
-String readWebData(String Link = "https://www.google.co.th/") {
-  httpClient.begin(wifiClient, Link);
-  int httpCode = httpClient.GET();
-  String payLoad = httpClient.getString();
-  httpClient.end();
-  return payLoad;
 }
 
 #include <ESP8266WebServer.h>
 ESP8266WebServer server(80);
-const String linkIndexHtml = "https://drive.google.com/uc?export=download&id=19jHTfveYjz8lz64_wMkonXL7kJmEwdgb";
-const String linkLoginHtml = "https://drive.google.com/uc?export=download&id=132b_zs15qLgbJs-HemHpUqT84gM7zHvz";
-const String linkJqueryMinJs = "https://drive.google.com/uc?export=download&id=197YSxH7ZgGUKBJ1HhDRJ0cY8KVTvTKBy";
-const String linkBootstrapMinCss = "https://drive.google.com/uc?export=download&id=1IAqyMu7ISbN9M5-X3WrwvbqnIeWlr4Zr";
-const String linkBootstrapMinCssMap = "https://drive.google.com/uc?export=download&id=1Cxyrildg1I5IDPRkjvwvT4FzCBv-A5GC";
-const String linkBootstrapThemeMinCss = "https://drive.google.com/uc?export=download&id=1y33RHBGHvauCW1gurxObcAu9uzZIk7n5";
-const String linkBootstrapThemeMinCssMap = "https://drive.google.com/uc?export=download&id=1d73zR0sG4CFH4U4PMuwRQ_NZTiMauJ16";
-const String linkBootstrapMinJs = "https://drive.google.com/uc?export=download&id=1O9yRCHjNdCKRmaVQlxPNLA40TcDLY2XQ";
+const String linkIndexHtml = "";
+const String linkLoginHtml = "";
+const String linkJqueryMinJs = "";
+const String linkBootstrapMinCss = "";
+const String linkBootstrapMinCssMap = "";
+const String linkBootstrapThemeMinCss = "";
+const String linkBootstrapThemeMinCssMap = "";
+const String linkBootstrapMinJs = "";
 void handleRoot() {
   if (!is_authentified()) {
     server.sendHeader("Location", "/login");
     server.sendHeader("Cache-Control", "no-cache");
     server.send(301);
-    return;
   }
 
   String result = readWebData(linkIndexHtml);
-  String content;
-  server.send(200, "text/html", content);
+  server.send(200, "text/html", result);
 }
 void handleLogin() {
   String msg;
@@ -84,47 +69,50 @@ void handleLogin() {
 }
 void handleJqueryMinJs() {
   String result = readWebData(linkJqueryMinJs);
-  String content;
-  server.send(200, "text/javascript", content);
+  server.send(200, "text/javascript", result);
 }
 void handleBootstrapMinCss() {
   String result = readWebData(linkBootstrapMinCss);
-  String content;
-  server.send(200, "text/css", content);
+  server.send(200, "text/css", result);
 }
 void handleBootstrapMinCssMap() {
   String result = readWebData(linkBootstrapMinCssMap);
-  String content;
-  server.send(200, "text/css", content);
+  server.send(200, "text/css", result);
 }
 void handleBootstrapThemeMinCss() {
   String result = readWebData(linkBootstrapThemeMinCss);
-  String content;
-  server.send(200, "text/css", content);
+  server.send(200, "text/css", result);
 }
 void handleBootstrapThemeMinCssMap() {
   String result = readWebData(linkBootstrapThemeMinCssMap);
-  String content;
-  server.send(200, "text/css", content);
+  server.send(200, "text/css", result);
 }
 void handleBootstrapMinJs() {
   String result = readWebData(linkBootstrapMinJs);
-  String content;
-  server.send(200, "text/javascript", content);
+  server.send(200, "text/javascript", result);
 }
 
 String inComing = "";
 
 void setup() {
   Serial.begin(9600);
-  Serial.print("Last Upload = ");
-  Serial.print(__DATE__);
-  Serial.print(" / ");
-  Serial.print(__TIME__);
-  Serial.println();
+  delay(1000);
+  Serial.println("Start Setup.");
 
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP("Note_WIFI", "11111111");
+
+  Serial.println("WiFi connecting");
+  while (wifiMulti.run() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print('.');
+  }
+  Serial.println();
+  Serial.println("WiFi connected");
+  Serial.print("Connected to ");
+  Serial.println(WiFi.SSID());
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
 
   server.on("/", handleRoot);
   server.on("/login", handleLogin);
@@ -142,10 +130,11 @@ void setup() {
   server.collectHeaders(headerkeys, headerkeyssize);
   server.begin();
   Serial.println("HTTP server started");
+  readWebData();
 }
 
 void loop() {
-  checkWiFiConnect();
+  //  checkWiFiConnect();
   server.handleClient();
 
   readSerialData();
@@ -157,6 +146,10 @@ void readSerialData() {
     if (inComing != "") {
       inComing.trim();
       Serial.println(inComing);
+
+      if (inComing == "readWebData") {
+        String webData = readWebData();
+      }
     }
   }
 }
