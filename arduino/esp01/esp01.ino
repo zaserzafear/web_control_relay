@@ -42,33 +42,51 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
+    Serial.print("web server : ");
+    Serial.println("/");
     request->send(SPIFFS, "/index.html", "text/html");
   });
-  server.on("/login", HTTP_GET, [](AsyncWebServerRequest * request) {
+  server.on("/login.php", HTTP_GET, [](AsyncWebServerRequest * request) {
+    Serial.print("web server : ");
+    Serial.println("/login.php");
     request->send(SPIFFS, "/login.html", "text/html");
   });
   server.on("/js/jquery.min.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+    Serial.print("web server : ");
+    Serial.println("/js/jquery.min.js");
     request->send(SPIFFS, "/js/jquery.min.js", "text/javascript");
   });
   server.on("/css/bootstrap.min.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+    Serial.print("web server : ");
+    Serial.println("/css/bootstrap.min.css");
     request->send(SPIFFS, "/css/bootstrap.min.css", "text/css");
   });
   server.on("/css/bootstrap-theme.min.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+    Serial.print("web server : ");
+    Serial.println("/css/bootstrap-theme.min.css");
     request->send(SPIFFS, "/css/bootstrap-theme.min.css", "text/css");
   });
   server.on("/js/bootstrap.min.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+    Serial.print("web server : ");
+    Serial.println("/js/bootstrap.min.js");
     request->send(SPIFFS, "/js/bootstrap.min.js", "text/javascript");
   });
-  server.on("/relay", HTTP_POST, [](AsyncWebServerRequest * request) {
+  server.on("/relay.php", HTTP_POST, [](AsyncWebServerRequest * request) {
+    Serial.print("web server : ");
+    Serial.println("/relay.php");
     String relayParamName = "relay";
     String relayParamValue = "";
-    if (request->hasParam(relayParamName)) {
-      relayParamValue = request->getParam("relay")->value();
+
+    if (request->hasParam(relayParamName, true)) {
+      AsyncWebParameter* p = request->getParam(relayParamName, true);
+      relayParamValue = p->value();
       Serial.println(relayParamValue);
     }
+
     request->send(200, "text/plain", "param name : " + relayParamName + " // param value : " + relayParamValue);
   });
   server.onNotFound([](AsyncWebServerRequest * request) {
+    Serial.println("web server : onNotFound");
     request->send(404, "text/html", "<H1>HTTP ERROR 404</H1>");
   });
 
